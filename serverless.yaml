@@ -1,0 +1,21 @@
+service: express-serverless
+frameworkVersion: '4'
+provider:
+  name: aws
+  runtime: nodejs18.x # Adjust according to your Node.js version requirement (e.g., nodejs14.x)
+  memorySize: 512 # Adjust as needed
+  timeout: 10 # Adjust as needed
+  region: us-east-1 # Adjust to your desired region
+
+functions:
+  apiusers:
+    handler: index.handler
+    events:
+    - httpApi:
+        method: '*'
+        path: '/api/{proxy+}' # Endpoint configuration for API Gateway
+
+
+custom:
+  esbuild:
+    bundle: true # Enable esbuild bundling for faster deployments
