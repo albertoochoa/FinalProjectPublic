@@ -1,29 +1,30 @@
 const Joi = require('joi');
 const PokemonData = require('../models/pokemons');
+
 const querySchema = Joi.object({
-  id: Joi.number()
-    .integer()
-    .positive()
-    .required()
+  id: Joi.number() 
+    .integer() 
+    .positive() 
+    .required() 
     .messages({
-      'any.required': 'Pokémon ID is required!',
-      'number.base': 'Pokémon ID must be a valid number!',
-      'number.integer': 'Pokémon ID must be an integer!',
-      'number.positive': 'Pokémon ID must be a positive integer!',
+      'any.required': 'Pokémon ID is required!', 
+      'number.base': 'Pokémon ID must be a valid number!', 
+      'number.integer': 'Pokémon ID must be an integer!', 
+      'number.positive': 'Pokémon ID must be a positive integer!', 
     }),
 });
 
 const getPokemonHandler = async (request, h) => {
   try {
     const { error, value } = querySchema.validate(request.query, {
-      abortEarly: false,
+      abortEarly: false, 
     });
 
     if (error) {
       return h
         .response({
           message: 'Validation error',
-          details: error.details.map((detail) => detail.message),
+          details: error.details.map((detail) => detail.message), 
         })
         .code(400);
     }
@@ -34,7 +35,7 @@ const getPokemonHandler = async (request, h) => {
       return h
         .response({
           message: `Fetched Pokémon ${existingPokemon.name} from the database.`,
-          data: existingPokemon,
+          data: existingPokemon, 
         })
         .code(200);
     }
@@ -43,53 +44,45 @@ const getPokemonHandler = async (request, h) => {
     if (!response.ok) {
       return h
         .response({
-          message: `Cannot fetch Pokemon with ID: ${id}`,
-          error: response.statusText,
+          message: `Cannot fetch Pokemon with ID: ${id}`, 
+          error: response.statusText, 
         })
-        .code(response.status);
-    }
-    else if (response.status === 404) {
-      return h
-        .response({
-          message: `Pokemon with ID ${id} not found.`,
-        })
-        .code(404);
+        .code(response.status); 
     }
 
     const data = await response.json();
     const pokemonData = {
-      id: data.id,
-      name: data.name,
-      abilities: data.abilities.map((ability) => ability.ability.name),
-      weight: data.weight,
-      height: data.height,
-      types: data.types.map((type) => type.type.name),
-      image: data.sprites.front_default,
+      id: data.id, 
+      name: data.name, 
+      abilities: data.abilities.map((ability) => ability.ability.name), 
+      weight: data.weight, 
+      height: data.height, 
+      types: data.types.map((type) => type.type.name), 
+      image: data.sprites.front_default, 
     };
 
     await PokemonData.updateOne(
-      { id: pokemonData.id },
-      { $set: pokemonData },
-      { upsert: true }
+      { id: pokemonData.id }, 
+      { $set: pokemonData }, 
+      { upsert: true } 
     );
-
     return h
       .response({
         message: `Fetched and saved Pokemon ${pokemonData.name} from the API.`,
-        data: pokemonData,
+        data: pokemonData, 
       })
       .code(200);
   } catch (err) {
     return h
       .response({
-        message: 'Error while processing the request',
-        error: err.message,
+        message: 'Error while processing the request', 
+        error: err.message, 
       })
       .code(500);
   }
 };
 
 module.exports = {
-  method: 'GET',
-  handler: getPokemonHandler,
+  method: 'GET', 
+  handler: getPokemonHandler, 
 };

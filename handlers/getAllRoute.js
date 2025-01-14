@@ -5,26 +5,26 @@ const saveAllPokemonsHandler = async (request, h) => {
     const savePokemon = async (id) => {
       try {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`);
-        if (!response.ok) {
+        if (!response.ok) { 
           console.error(`Failed to fetch data for Pokemon ID: ${id}`);
-          return null;
+          return null; 
         }
 
         const data = await response.json();
         const pokemonData = {
-          id: data.id,
-          name: data.name,
-          abilities: data.abilities.map((ability) => ability.ability.name),
-          weight: data.weight,
-          height: data.height,
-          types: data.types.map((type) => type.type.name),
-          image: data.sprites.front_default,
+          id: data.id, 
+          name: data.name, 
+          abilities: data.abilities.map((ability) => ability.ability.name), 
+          weight: data.weight, 
+          height: data.height, 
+          types: data.types.map((type) => type.type.name), 
+          image: data.sprites.front_default, 
         };
 
         const result = await PokemonData.updateOne(
-          { id: pokemonData.id },
-          { $set: pokemonData },
-          { upsert: true }
+          { id: pokemonData.id }, 
+          { $set: pokemonData }, 
+          { upsert: true } 
         );
 
         if (result.modifiedCount === 0) {
@@ -40,9 +40,10 @@ const saveAllPokemonsHandler = async (request, h) => {
     };
 
     const batchSize = 20; 
-    const totalIds = 100;
+    const totalIds = 100; 
+
     for (let i = 0; i < totalIds; i += batchSize) {
-      const batchPromises = [];
+      const batchPromises = []; 
       for (let j = i + 1; j <= Math.min(i + batchSize, totalIds); j++) {
         batchPromises.push(savePokemon(j));
       }
@@ -58,13 +59,13 @@ const saveAllPokemonsHandler = async (request, h) => {
     return h
       .response({
         message: 'Error while fetching Pokemon data.',
-        error: error.message,
+        error: error.message, 
       })
       .code(500);
   }
 };
 
 module.exports = {
-  method: 'GET',
-  handler: saveAllPokemonsHandler,
+  method: 'GET', 
+  handler: saveAllPokemonsHandler, 
 };
